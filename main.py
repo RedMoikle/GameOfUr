@@ -6,6 +6,7 @@ I created a playable board game inside of Maya, based on the ancient Mesopotamia
 
 This game uses scriptjobs placed on automatically generated Maya objects to interact with the game code.
 """
+import maya.OpenMaya as om
 
 from game_pieces import *
 
@@ -17,26 +18,32 @@ def run():
 
 class GameManager(object):
     def __init__(self):
+        self.running = True
         self.pieces = {}
-        self.scriptjob = None
+        self.event_idx = None
         self.create_board()
         self.create_pieces()
-        self.create_scriptjob()
+        self.create_event()
+
     def __del__(self):
-        self.delete_scriptjob()
+        self.delete_event()
 
     def add_piece(self, piece):
         self.pieces[piece.transform] = piece
 
-    def create_scriptjob(self):
-        self.scriptjob = pm.scriptJob(conditionTrue=['SelectionChanged', self._selection_made], protected=True)
-    def delete_scriptjob(self):
-        if self.scriptjob is None:
+    def create_event(self):
+        self.event_idx = om.MEventMessage.addEventCallback("SelectionChanged", self._selection_made)
+        # self.event_idx = pm.scriptJob(conditionTrue=['SelectionChanged', self._selection_made], protected=True)
+
+    def delete_event(self):
+        if self.event_idx is None:
             return
-        print("kill sj")
-        pm.scriptJob(kill=self.scriptjob, force=True)
-    def _selection_made(self):
-        print("sel")
+        om.MMessage.removeCallback(self.event_idx)
+
+    def _selection_made(self, *args):
+        if not self.running:
+            return
+        print(args)
         sel = pm.selected()
         if not sel:
             return
@@ -46,7 +53,6 @@ class GameManager(object):
         if isinstance(gameobject, Interactable):
             gameobject.action()
             pm.select(clear=True)
-
 
     def create_board(self):
         BoardTile(self)
