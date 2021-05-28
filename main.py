@@ -20,6 +20,7 @@ class GameManager(object):
     def __init__(self):
         self.running = True
         self.pieces = {}
+        self.dice = []
         self.event_idx = None
         self.create_board()
         self.create_pieces()
@@ -61,6 +62,12 @@ class GameManager(object):
 
     def create_pieces(self):
         Interactable(self)
+        for i in range(4):
+            self.dice.append(Die(self, position=(10 + (i % 2) * 3, 0, (i // 2) * 3)))
+
+    def roll_dice(self):
+        rolled_values = [die.roll() for die in self.dice]
+        print("Rolled: {} [{}]".format(sum(rolled_values), "| ".join(map(str, rolled_values))))
 
 
 if __name__ == '__main__':

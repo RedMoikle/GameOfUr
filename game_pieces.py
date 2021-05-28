@@ -1,3 +1,5 @@
+import random
+
 import pymel.core as pm
 
 
@@ -45,3 +47,16 @@ class Interactable(GameObject):
     def action(self):
         """Override this method to create the selection behaviour for this object"""
         print("Piece {} selected".format(self.transform.name()))
+
+
+class Die(Interactable):
+    def create_model(self):
+        self.transform, self.shape = pm.polyCone(subdivisionsAxis=3, height=1.44)
+
+    def action(self):
+        self.manager.roll_dice()
+
+    def roll(self):
+        rolled_value = random.choice([0, 1])
+        print(rolled_value)
+        return rolled_value
