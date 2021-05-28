@@ -4,7 +4,7 @@ Game of Ur in Maya
 This is a recreation of my very first Python project. While learning the language,
 I created a playable board game inside of Maya, based on the ancient Mesopotamian "Royal Game of Ur".
 
-This game uses scriptjobs placed on automatically generated Maya objects to interact with the game code.
+This game uses API callbacks and automatically generated Maya objects to interact with the game code.
 """
 import maya.OpenMaya as om
 
@@ -26,8 +26,16 @@ class GameManager(object):
         self.create_pieces()
         self.create_event()
 
+        self.rollled_value = None
+        self.turn_stage = None
+        self.player_turn = 0
+
     def __del__(self):
         self.delete_event()
+
+    def start_turn(self):
+        self.turn_stage = "rolling"
+
 
     def add_piece(self, piece):
         self.pieces[piece.transform] = piece
@@ -66,9 +74,12 @@ class GameManager(object):
             self.dice.append(Die(self, position=(10 + (i % 2) * 3, 0, (i // 2) * 3)))
 
     def roll_dice(self):
+        if not self.turn_stage == "rolling":
+            return
         rolled_values = [die.roll() for die in self.dice]
-        print("Rolled: {} [{}]".format(sum(rolled_values), "| ".join(map(str, rolled_values))))
-
+        self.rollled_value = sum(rolled_values)
+        print("Rolled: {} [{}]".format(self.rollled_value, "| ".join(map(str, rolled_values))))
+        self.turn_stage = "moving"
 
 if __name__ == '__main__':
     ur_manager = run()
