@@ -26,9 +26,10 @@ class GameManager(object):
         self.create_pieces()
         self.create_event()
 
-        self.rollled_value = None
         self.turn_stage = None
         self.player_turn = 0
+
+        self.rolled_value = None
 
     def __del__(self):
         self.delete_event()
