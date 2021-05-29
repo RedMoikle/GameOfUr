@@ -69,9 +69,10 @@ class GameManager(object):
         BoardTile(self, position=(0, 0, 1))
 
     def create_pieces(self):
-        Interactable(self)
+        Token(self)
         for i in range(4):
             self.dice.append(Die(self, position=(10 + (i % 2) * 3, 0, (i // 2) * 3)))
+
 
     def roll_dice(self):
         if not self.turn_stage == "rolling":

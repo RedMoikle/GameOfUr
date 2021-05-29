@@ -60,3 +60,19 @@ class Die(Interactable):
         rolled_value = random.choice([0, 1])
         print(rolled_value)
         return rolled_value
+
+class Token(Interactable):
+    def create_model(self):
+        self.transform, self.shape = pm.polySphere(radius=0.2)
+        pm.scale(self.transform, [1, 0.5, 1])
+        pm.move(self.transform, [0,0.1,0])
+        pm.makeIdentity(self.transform, apply=True, translate=True)
+    def action(self):
+        #check turn stage/player turn
+        #get rolled value
+        #check target tile
+        #move
+        #free turn or end turn
+        pass
+    def check_target_tile(self):
+        rolled_value = self.manager.rolled_value()
