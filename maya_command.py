@@ -9,12 +9,14 @@ Note: could also build this into the __init__ module of the package, so the game
 try:
     # This should not be included in a production environment just for quick testing of changes without restarting Maya
     reload(GameOfUr.game_pieces)
+    reload(GameOfUr.interface)
     reload(ur)
+
 
 except NameError as e:
     print("first load")
 import GameOfUr
 import GameOfUr.main as ur
 
-ur_game = ur.run()
+ur_game, ur_ui = ur.run()
 

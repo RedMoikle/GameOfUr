@@ -9,11 +9,12 @@ This game uses API callbacks and automatically generated Maya objects to interac
 import maya.OpenMaya as om
 
 from game_pieces import *
-
+import interface
 
 def run():
     manager = GameManager()
-    return manager
+    ui = interface.UrGameWindow.show_dialog()
+    return manager, ui
 
 
 class GameManager(object):
@@ -151,4 +152,4 @@ class GameManager(object):
         print("player {} wins".format(player+1))
         self.running = False
 if __name__ == '__main__':
-    ur_manager = run()
+    ur_manager, ur_ui = run()
