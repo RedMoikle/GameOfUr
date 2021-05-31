@@ -59,7 +59,7 @@ class GameManager(object):
     def create_board(self):
         for i, tile in enumerate(self.board):
             if tile in [1, 2]:
-                BoardTile(self, position=(i % 3, 0, i // 3))
+                BoardTile(self, position=(i % 3, 0, i // 3), rosetta=tile == 2)
 
     def create_event(self):
         self.event_idx = om.MEventMessage.addEventCallback("SelectionChanged", self._selection_made)
@@ -74,6 +74,7 @@ class GameManager(object):
         self.delete_event()
         for piece in self.pieces.values():
             piece.delete_model()
+            piece.delete_textures()
         self.pieces = {}
 
     def _selection_made(self, *args):
