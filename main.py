@@ -18,6 +18,21 @@ def run():
 
 class GameManager(object):
     def __init__(self):
+        self.board_scale = 1.0
+        self.board = [2, 1, 2,
+                      1, 1, 1,
+                      1, 1, 1,
+                      1, 2, 1,
+                      0, 1, 0,
+                      3, 1, 0,
+                      2, 1, 2,
+                      1, 1, 1]
+
+        self.players = 2
+        self.paths = [[9, 6, 3, 0, 1, 4, 7, 10, 13, 16, 19, 22, 21, 18, 15],
+                      [11, 8, 5, 2, 1, 4, 7, 10, 13, 16, 19, 22, 23, 20, 17]]
+
+        self.token_count = 7
         self.running = True
         self.pieces = {}
         self.dice = []
@@ -39,6 +54,11 @@ class GameManager(object):
 
     def add_piece(self, piece):
         self.pieces[piece.transform] = piece
+
+    def create_board(self):
+        for i, tile in enumerate(self.board):
+            if tile in [1, 2]:
+                BoardTile(self, position=(i % 3, 0, i // 3))
 
     def create_event(self):
         self.event_idx = om.MEventMessage.addEventCallback("SelectionChanged", self._selection_made)
@@ -68,11 +88,6 @@ class GameManager(object):
         if isinstance(gameobject, Interactable):
             gameobject.action()
             pm.select(clear=True)
-
-    def create_board(self):
-        BoardTile(self)
-        BoardTile(self, position=(1, 0, 0))
-        BoardTile(self, position=(0, 0, 1))
 
     def create_pieces(self):
         Token(self)
