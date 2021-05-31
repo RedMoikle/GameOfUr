@@ -17,7 +17,7 @@ class GameObject(object):
         self.transform = None
         self.shape = None
         self.create_model()
-        self.update_position()
+        self.update_model_transform()
         self.manager.add_piece(self)
 
     def __del__(self):
@@ -151,6 +151,16 @@ class Token(Interactable):
             return None
 
         return self.path[self.path_position]
+
+    def update_model_transform(self):
+        if self.on_path:
+            self.model_position = (self.tile_location % 3 + 0.5, 0, self.tile_location // 3 + 0.5)
+        else:
+            xpos = (self.token_id % 4 + 2.5) * (2 * self.player - 1) + 1.5
+            zpos = self.token_id // 4 + self.finished * 4
+            self.model_position = (xpos + random.random() * 0.2, -1, zpos + random.random() * 0.2)
+        super(Token, self).update_model_transform()
+
     def create_model(self):
         self.transform, self.shape = pm.polySphere(radius=0.2)
         pm.scale(self.transform, [1, 0.5, 1])
