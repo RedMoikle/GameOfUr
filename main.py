@@ -95,9 +95,10 @@ class GameManager(object):
     def create_pieces(self):
         for player_i in range(self.players):
             for i in range(self.token_count):
-                new_token = Token(self)
-                new_token.player = player_i
-                new_token.token_id = i
+                new_token = Token(self,
+                                  player=player_i,
+                                  token_id=i,
+                                  path=self.paths[player_i])
                 self.tokens.append(new_token)
         for i in range(4):
             self.dice.append(Die(self, position=((i // 2) * 3, 0, 10 + (i % 2) * 3)))

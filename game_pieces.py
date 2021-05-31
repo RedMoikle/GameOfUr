@@ -11,7 +11,7 @@ class GameObject(object):
         This includes the tiles as well as the player tokens and dice"""
         self.manager = manager
 
-        self.position = position
+        self.model_position = position
         self.game_scale = game_scale
 
         self.transform = None
@@ -135,16 +135,16 @@ class Token(Interactable):
         self.player = kwargs.pop("player", None)
         self.token_id = kwargs.pop("token_id", None)
         self.path = kwargs.pop("path", None)
-        self.path_position = kwargs.pop("position", -1)
+        self.path_position = kwargs.pop("path_position", -1)
         self.on_path = kwargs.pop("on_path", False)
         self.finished = kwargs.pop("finished", False)
 
         super(Token, self).__init__(*args, **kwargs)
 
     @property
-    def position(self):
+    def tile_location(self):
         if self.path is None:
-            raise IndexError("Path undefined for this token. Please set a path with Token.set_path(path)")
+            raise IndexError("Path undefined for this token. Please set a path with Token.path")
         if self.finished or not self.on_path:
             return None
         if self.path_position is None:
