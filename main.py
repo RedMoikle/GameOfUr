@@ -24,7 +24,7 @@ class GameManager(object):
                       1, 1, 1,
                       1, 2, 1,
                       0, 1, 0,
-                      3, 1, 0,
+                      3, 1, 3,
                       2, 1, 2,
                       1, 1, 1]
 
@@ -40,6 +40,7 @@ class GameManager(object):
         self.event_idx = None
         self.create_board()
         self.create_pieces()
+        pm.select(clear=True)
         self.create_event()
 
         self.turn_stage = None
