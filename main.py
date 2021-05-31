@@ -35,6 +35,7 @@ class GameManager(object):
         self.token_count = 7
         self.running = True
         self.pieces = {}
+        self.tokens = []
         self.dice = []
         self.event_idx = None
         self.create_board()
