@@ -17,6 +17,14 @@ def run():
 
 
 class GameManager(object):
+    TILE_NOTHING = 0
+    TILE_NORMAL = 1
+    TILE_ROSETTA = 2
+    TILE_GOAL = 3
+
+    STAGE_ROLLING = "rolling"
+    STAGE_MOVING = "moving"
+
     def __init__(self):
         self.board_scale = 1.0
         self.board = [2, 1, 2,
@@ -32,6 +40,8 @@ class GameManager(object):
         self.paths = [[9, 6, 3, 0, 1, 4, 7, 10, 13, 16, 19, 22, 21, 18, 15],
                       [11, 8, 5, 2, 1, 4, 7, 10, 13, 16, 19, 22, 23, 20, 17]]
 
+        self.player_scores = [0]*self.players
+        self.target_score = 7
         self.token_count = 7
         self.running = True
         self.pieces = {}
@@ -104,12 +114,40 @@ class GameManager(object):
             self.dice.append(Die(self, position=((i // 2) * 3, 0, 10 + (i % 2) * 3)))
 
     def roll_dice(self):
-        if not self.turn_stage == "rolling":
+        if not self.turn_stage == self.STAGE_ROLLING:
             return
         rolled_values = [die.roll() for die in self.dice]
-        self.rollled_value = sum(rolled_values)
-        print("Rolled: {} [{}]".format(self.rollled_value, "| ".join(map(str, rolled_values))))
-        self.turn_stage = "moving"
+        self.rolled_value = sum(rolled_values)
+        print("Rolled: {} [{}]".format(self.rolled_value, "| ".join(map(str, rolled_values))))
+        self.turn_stage = self.STAGE_MOVING
+        if self.rolled_value == 0:
+            self.end_turn()
 
+    def end_turn(self):
+        self.turn_stage = self.STAGE_ROLLING
+        self.player_turn = (self.player_turn + 1) % self.players
+
+    def free_turn(self):
+        self.turn_stage = self.STAGE_ROLLING
+
+    def get_position_collision(self, tile_position):
+        """Check if a token already exists on the specified tile.
+        If one is present, return the token, otherwise return None"""
+        # don't check for collisions if the tile_location is not specified (not on the board)
+        if tile_position is None:
+            return None
+
+        # check for collisions
+        for token in self.tokens:
+            if token.tile_location == tile_position:
+                return token
+        return None
+    def score_point(self, player):
+        self.player_scores[player] += 1
+        if self.player_scores[player] >= self.target_score:
+            self.win_game(player)
+    def win_game(self, player):
+        print("player {} wins".format(player+1))
+        self.running = False
 if __name__ == '__main__':
     ur_manager = run()

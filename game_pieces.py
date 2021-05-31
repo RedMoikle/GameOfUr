@@ -3,6 +3,19 @@ import random
 import pymel.core as pm
 
 
+class Messages(object):
+    INVALID_MOVE = "invalid-move"
+    FREE_TURN = "free-turn"
+    MOVE_BLOCKED = "move-blocked"
+    FRIENDLY_TOKEN = "friendly-token"
+    OPPONENT_TOKEN = "opponent-token"
+    PROTECTED_OPPONENT = "protected-opponent"
+    DISPLACED_OPPONENT = "displaced-opponent"
+    TOO_FAR = "too-far"
+    PATH_COMPLETE = "path-complete"
+    MOVE_SUCCESSFULL = "move-successful"
+
+
 class GameObject(object):
     textures = {}
 
@@ -175,12 +188,82 @@ class Token(Interactable):
         pm.sets(sg, forceElement=self.transform)
 
     def action(self):
-        # check turn stage/player turn
-        # get rolled value
-        # check target tile
-        # move
-        # free turn or end turn
-        pass
+        if not self.manager.player_turn == self.player:
+            return
+        if not self.manager.turn_stage == self.manager.STAGE_MOVING:
+            return
 
-    def check_target_tile(self):
-        rolled_value = self.manager.rolled_value()
+        rolled_value = self.manager.rolled_value
+        target_position = self.path_position + rolled_value
+        if target_position < len(self.path):
+            target_tile = self.path[target_position]
+            move_check, collision = self.check_move(target_tile)
+
+        else:
+            target_tile = None
+            move_check = [Messages.MOVE_BLOCKED, Messages.TOO_FAR]
+            collision = None
+        if target_tile is not None:
+            print("trying to move to {} - {} ({})".format(target_position, target_tile, self.manager.board[target_tile]))
+        print(move_check)
+
+        if Messages.MOVE_BLOCKED in move_check:
+            # TODO: feedback to show why a move is invalid
+            return
+
+        if Messages.DISPLACED_OPPONENT in move_check:
+            collision.displace()
+
+        if Messages.MOVE_SUCCESSFULL in move_check:
+            self.on_path = True
+            self.move(target_position)
+        if Messages.PATH_COMPLETE in move_check:
+            self.end_path()
+        if Messages.FREE_TURN not in move_check:
+            self.manager.end_turn()
+        else:
+            self.manager.free_turn()
+
+    def move(self, path_position):
+        self.path_position = path_position
+        self.update_model_transform()
+
+    def displace(self):
+        self.on_path = False
+        self.path_position = -1
+        self.update_model_transform()
+
+    def end_path(self):
+        self.finished = True
+        self.on_path = False
+        self.update_model_transform()
+        self.manager.score_point(self.player)
+
+    def check_move(self, target_tile):
+        messages = []
+        collision = self.manager.get_position_collision(target_tile)
+        tile_type = self.manager.board[target_tile]
+        # token blocking/displacement
+        if collision is not None:
+            if collision.player == self.player:
+                messages.append(Messages.MOVE_BLOCKED)
+                messages.append(Messages.FRIENDLY_TOKEN)
+            else:
+                messages.append(Messages.OPPONENT_TOKEN)
+                if tile_type == self.manager.TILE_ROSETTA:
+                    messages.append(Messages.MOVE_BLOCKED)
+                    messages.append(Messages.PROTECTED_OPPONENT)
+                else:
+                    messages.append(Messages.MOVE_SUCCESSFULL)
+                    messages.append(Messages.DISPLACED_OPPONENT)
+        else:
+            if tile_type == self.manager.TILE_ROSETTA:
+                messages.append(Messages.MOVE_SUCCESSFULL)
+                messages.append(Messages.FREE_TURN)
+            elif tile_type == self.manager.TILE_GOAL:
+                messages.append(Messages.MOVE_SUCCESSFULL)
+                messages.append(Messages.PATH_COMPLETE)
+            else:
+                messages.append(Messages.MOVE_SUCCESSFULL)
+
+        return messages, collision
