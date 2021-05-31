@@ -147,7 +147,7 @@ class Token(Interactable):
             raise IndexError("Path undefined for this token. Please set a path with Token.path")
         if self.finished or not self.on_path:
             return None
-        if self.path_position is None:
+        if self.path_position is -1:
             return None
 
         return self.path[self.path_position]
