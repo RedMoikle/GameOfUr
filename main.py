@@ -57,12 +57,13 @@ class GameManager(object):
         self.player_turn = 0
 
         self.rolled_value = None
+        self.start_turn()
 
     def __del__(self):
         self.delete_all()
 
     def start_turn(self):
-        self.turn_stage = "rolling"
+        self.turn_stage = self.STAGE_ROLLING
 
     def add_piece(self, piece):
         self.pieces[piece.transform] = piece
