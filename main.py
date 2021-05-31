@@ -32,11 +32,10 @@ class GameManager(object):
         self.rolled_value = None
 
     def __del__(self):
-        self.delete_event()
+        self.delete_all()
 
     def start_turn(self):
         self.turn_stage = "rolling"
-
 
     def add_piece(self, piece):
         self.pieces[piece.transform] = piece
@@ -49,6 +48,12 @@ class GameManager(object):
         if self.event_idx is None:
             return
         om.MMessage.removeCallback(self.event_idx)
+
+    def delete_all(self):
+        self.delete_event()
+        for piece in self.pieces.values():
+            piece.delete_model()
+        self.pieces = {}
 
     def _selection_made(self, *args):
         if not self.running:

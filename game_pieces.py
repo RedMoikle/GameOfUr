@@ -4,7 +4,7 @@ import pymel.core as pm
 
 
 class GameObject(object):
-    def __init__(self, manager, position=(0, 0, 0), game_scale=1.0):
+    def __init__(self, manager, position=(0, 0, 0), game_scale=1.0, *args, **kwargs):
         """Parent class for all game objects that have a mesh representation in Maya.
         This includes the tiles as well as the player tokens and dice"""
         self.manager = manager
@@ -18,6 +18,9 @@ class GameObject(object):
         self.update_position()
         self.manager.add_piece(self)
 
+    def __del__(self):
+        self.delete_model()
+
     def create_model(self):
         """Override this method to create the transform for this object"""
         pass
@@ -26,6 +29,9 @@ class GameObject(object):
         xpos, ypos, zpos = (ax * self.game_scale for ax in self.position)
         pm.move(xpos, ypos, zpos, self.transform)
 
+    def delete_model(self):
+        pm.delete(self.transform)
+
 
 class BoardTile(GameObject):
     def create_model(self):
@@ -33,6 +39,7 @@ class BoardTile(GameObject):
 
         # move shape but keep transform at 0,0,0
         # TODO: find a more elegant way of moving shape. Maybe movePolyVertex?
+        # TODO: rosetta tiles
         rotate_pivot = self.transform.rotatePivot
         scale_pivot = self.transform.scalePivot
         pm.move(-0.5, 0.5, -0.5, rotate_pivot, scale_pivot, rotatePivotRelative=True)
@@ -61,18 +68,21 @@ class Die(Interactable):
         print(rolled_value)
         return rolled_value
 
+
 class Token(Interactable):
     def create_model(self):
         self.transform, self.shape = pm.polySphere(radius=0.2)
         pm.scale(self.transform, [1, 0.5, 1])
-        pm.move(self.transform, [0,0.1,0])
+        pm.move(self.transform, [0, 0.1, 0])
         pm.makeIdentity(self.transform, apply=True, translate=True)
+
     def action(self):
-        #check turn stage/player turn
-        #get rolled value
-        #check target tile
-        #move
-        #free turn or end turn
+        # check turn stage/player turn
+        # get rolled value
+        # check target tile
+        # move
+        # free turn or end turn
         pass
+
     def check_target_tile(self):
         rolled_value = self.manager.rolled_value()
