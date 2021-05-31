@@ -91,10 +91,14 @@ class GameManager(object):
             pm.select(clear=True)
 
     def create_pieces(self):
-        Token(self)
+        for player_i in range(self.players):
+            for i in range(self.token_count):
+                new_token = Token(self)
+                new_token.player = player_i
+                new_token.token_id = i
+                self.tokens.append(new_token)
         for i in range(4):
-            self.dice.append(Die(self, position=(10 + (i % 2) * 3, 0, (i // 2) * 3)))
-
+            self.dice.append(Die(self, position=((i // 2) * 3, 0, 10 + (i % 2) * 3)))
 
     def roll_dice(self):
         if not self.turn_stage == "rolling":
