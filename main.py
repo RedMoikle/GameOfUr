@@ -70,6 +70,7 @@ class GameManager(object):
         self.pieces[piece.transform] = piece
 
     def create_board(self):
+        Floor(self, position=(1.5, -1, 5))
         for i, tile in enumerate(self.board):
             if tile in [1, 2]:
                 BoardTile(self, position=(i % 3, 0, i // 3), rosetta=tile == 2)

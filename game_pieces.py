@@ -1,6 +1,9 @@
+import os
 import random
 
 import pymel.core as pm
+
+TEXTURES_DIR = os.path.join(__file__, "textures")
 
 
 class Messages(object):
@@ -56,7 +59,8 @@ class GameObject(object):
             material.outColor.connect(sg.surfaceShader)
             cls.textures[name] = (material, sg)
         else:
-            print("shader {} already exists".format(name))
+            pass
+            #print("shader {} already exists".format(name))
         return (new, cls.textures[name][0], cls.textures[name][1])
 
     def update_model_transform(self):
@@ -75,6 +79,13 @@ class GameObject(object):
             except pm.MayaNodeError as e:
                 print("{} already deleted".format(name))
         self.textures = {}
+
+
+class Floor(GameObject):
+    textures = {}
+
+    def create_model(self):
+        self.transform, self.shape = pm.polyPlane(name="Ur_Table", height=30, width=30)
 
 
 class BoardTile(GameObject):
@@ -125,12 +136,23 @@ class Die(Interactable):
 
     def create_model(self):
         self.transform, self.shape = pm.polyCone(subdivisionsAxis=3, height=1.44)
+        rotate_pivot = self.transform.rotatePivot
+        scale_pivot = self.transform.scalePivot
+        pm.move(-0.5, -0.72, 0.0, rotate_pivot, scale_pivot, rotatePivotRelative=True)
+        pm.move(0.5, -0.27, 0.0, self.transform)
+        pm.makeIdentity(self.transform, apply=True, translate=True)
+        self.transform.setRotationOrder(6, True)
+        self.transform.rotate.set((0, random.random() * 360, 109.47 * random.choice([0, 1])))
         self.create_textures()
 
     def create_textures(self):
         new, material, sg = self.create_shader("die")
         if new:
             material.setColor((0.1, 0.1, 0.1))
+            texture_file = pm.shadingNode("file", asTexture=True)
+            print (texture_file)
+            texture_file.fileTextureName.set(os.path.join(TEXTURES_DIR, "die.jpg"))
+            pm.connectAttr(texture_file.outColor, material.color)
         pm.sets(sg, forceElement=self.transform)
 
     def action(self):
@@ -138,7 +160,7 @@ class Die(Interactable):
 
     def roll(self):
         rolled_value = random.choice([0, 1])
-        print(rolled_value)
+        self.transform.rotate.set((0, random.random() * 360, 109.47 * rolled_value))
         return rolled_value
 
 
