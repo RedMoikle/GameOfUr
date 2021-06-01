@@ -15,6 +15,7 @@ try:
 
 except NameError as e:
     print("first load")
+    print(e)
 import GameOfUr
 import GameOfUr.main as ur
 
