@@ -102,7 +102,7 @@ class GameManager(object):
             return
         gameobject = self.pieces[sel[0]]
         if isinstance(gameobject, Interactable):
-            gameobject.action()
+            gameobject.trigger_action()
             pm.select(clear=True)
 
     def create_pieces(self):

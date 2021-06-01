@@ -19,6 +19,18 @@ class Messages(object):
     MOVE_SUCCESSFULL = "move-successful"
 
 
+class Signal(object):
+    def __init__(self):
+        self.connections = []
+
+    def connect(self, func):
+        self.connections.append(func)
+
+    def emit(self, *args, **kwargs):
+        for func in self.connections:
+            func(*args, **kwargs)
+
+
 class GameObject(object):
     textures = {}
 
@@ -123,8 +135,18 @@ class BoardTile(GameObject):
 
 
 class Interactable(GameObject):
+    def __init__(self, *args, **kwargs):
+        self.before_action_event = Signal()
+        self.after_action_event = Signal()
+        super(Interactable, self).__init__(*args, **kwargs)
+
     def create_model(self):
         self.transform, self.shape = pm.polySphere(name="Ur_Interactable")
+
+    def trigger_action(self):
+        self.before_action_event.emit(triggering_object=self)
+        self.action()
+        self.after_action_event.emit(triggering_object=self)
 
     def action(self):
         """Override this method to create the selection behaviour for this object"""
@@ -226,7 +248,8 @@ class Token(Interactable):
             move_check = [Messages.MOVE_BLOCKED, Messages.TOO_FAR]
             collision = None
         if target_tile is not None:
-            print("trying to move to {} - {} ({})".format(target_position, target_tile, self.manager.board[target_tile]))
+            print(
+                "trying to move to {} - {} ({})".format(target_position, target_tile, self.manager.board[target_tile]))
         print(move_check)
 
         if Messages.MOVE_BLOCKED in move_check:
