@@ -300,17 +300,17 @@ class Token(Interactable):
         :return: the tile index of the specified path step
         :rtype: int
         """
+        target = self.path_position + offset
         if self.path is None:
             raise IndexError("Path undefined for this token. Please set a path with Token.path")
         if self.finished or not self.on_path:
             return None
-        if self.path_position is -1:
+        if target == -1:
             return None
-
-        return self.path[self.path_position]
+        return self.path[target]
 
     def update_model_transform(self):
-        tile = self.tile_location
+        tile = self.tile_location()
         if tile is not None:
             print(self.path_position)
             self.model_position = (tile % 3 + 0.5, 0, tile // 3 + 0.5)
