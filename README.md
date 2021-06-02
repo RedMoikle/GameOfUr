@@ -1,5 +1,6 @@
 # Game of Ur in Maya
-####by Michael Stickler
+
+**by Michael Stickler**
 
 This is a recreation of my very first Python project. While learning the language, I created a playable board game
 inside of Maya, based on the ancient Mesopotamian "Royal Game of Ur".
@@ -16,19 +17,27 @@ This game uses API callbacks placed on automatically generated Maya objects to i
 2. Paste it in \Documents\Maya\MAYA_VERSION\scripts
 
 
-3. In Maya, from the python command line, type `import GameOfUr` and hit Enter
+3. In Maya, from the python command line, type the following and hit Enter:
+   ```python
+    import GameOfUr
+   ```
 
    ![Import to get started](demo_images/demo_import.jpg)
 
 
 4. A window will pop up with a button to launch the game.
-   > If no window appears, try entering `mgs_ur_show_launcher()` instead
+   > If no window appears, try entering the following instead:
+   > ```python 
+   > mgs_ur_show_launcher()
+   > ```
 
 
 5. You can drag this icon with the middle mouse, and drop it onto one of Maya's shelves to create a shortcut to launch
    the game.
 
    ![Add to shelf](demo_images/demo_shelf.jpg)
+
+---
 
 ## Introduction
 
@@ -51,7 +60,10 @@ You interact with the game by selecting pieces, as you would any other object in
 ### Roll the dice
 
 It is player 1's (White) turn first, select a die, or click on the "Roll!" button in the UI to roll the dice.
-(you can see whose turn it is by the colour of the "Roll" button/display: White=Player 1, Black=Player 2)
+
+you can see whose turn it is by the colour of the "Roll" button/display: 
+- White = Player 1
+- Black = Player 2
 
 ![Roll the dice](demo_images/demo_roll.jpg)
 
@@ -66,7 +78,9 @@ It is player 1's (White) turn first, select a die, or click on the "Roll!" butto
 ### Move a token
 
 Your goal is to get all of your pieces round the board to the end. Each player has their own path, shown in the image
-below. Along the middle row, both players share the same path, and can come into conflict.
+below. 
+
+Along the middle row, both players share the same path, and can come into conflict.
 
 The "Roll" button changes to show the value rolled on the dice. Select one of your pieces, and it will move that many
 places along its path. (If it is possible to do so)
@@ -145,7 +159,7 @@ available. You have to make a move, even if you don't want to.
 
 ## Strategy
 
-Not all dice rolls are equal. some values are more common than others. 
+Not all dice rolls are equal. some values are more common than others.
 
 Here are the chances of rolling each value:
 
@@ -155,13 +169,14 @@ Here are the chances of rolling each value:
 |**1 or 3**| 1 in 8|
 |**2**| 1 in 4|
 
-> This means you can strategise by choosing which piece to move each turn, 
+> This means you can strategise by choosing which piece to move each turn,
 > positioning them in places that give you an advantage or give you the best chance of landing in a particular spot.
 
 ---
 
-##Notes
+## Notes
+
 - If the game window is closed, all of the game pieces/textures etc. will be deleted from Maya to clean up.
 - You can start a new game at any time by going to **Game** > **New game**
-- The debug menu gives you the ability to delete all objects from Maya, delete the event trigger, 
-  or temporarily disable the trigger (allowing you to select the game pieces without triggering game functions.)
+- The debug menu gives you the ability to delete all objects from Maya, delete the event trigger, or temporarily disable
+  the trigger (allowing you to select the game pieces without triggering game functions.)
