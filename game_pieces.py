@@ -193,8 +193,10 @@ class Token(Interactable):
         return self.path[self.path_position]
 
     def update_model_transform(self):
-        if self.on_path:
-            self.model_position = (self.tile_location % 3 + 0.5, 0, self.tile_location // 3 + 0.5)
+        tile = self.tile_location
+        if tile is not None:
+            print(self.path_position)
+            self.model_position = (tile % 3 + 0.5, 0, tile // 3 + 0.5)
         else:
             xpos = (self.token_id % 4 + 2.5) * (2 * self.player - 1) + 1.5
             zpos = self.token_id // 4 + self.finished * 4
