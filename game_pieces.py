@@ -24,7 +24,6 @@ class GameObject(object):
         self.shape = None
         self.create_model()
         self.update_model_transform()
-        self.manager.add_piece(self)
 
     def reset(self):
         self.model_position = self.origin_position

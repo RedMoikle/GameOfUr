@@ -121,10 +121,10 @@ class GameManager(object):
         self.pieces[piece.transform] = piece
 
     def create_board(self):
-        Floor(self, position=(1.5, -1, 5))
+        self.add_piece(Floor(self, position=(1.5, -1, 5)))
         for i, tile in enumerate(self.board):
             if tile in [1, 2]:
-                BoardTile(self, position=(i % 3, 0, i // 3), rosetta=tile == 2)
+                self.add_piece(BoardTile(self, position=(i % 3, 0, i // 3), rosetta=tile == 2))
 
     def create_event(self):
         self.event_idx = om.MEventMessage.addEventCallback("SelectionChanged", self._selection_made)
@@ -166,11 +166,14 @@ class GameManager(object):
                                   player=player_i,
                                   token_id=i,
                                   path=self.paths[player_i])
+                self.add_piece(new_token)
                 self.tokens.append(new_token)
         for i in range(4):
-            self.dice.append(Die(self,
-                                 position=((i // 2) * 4, -1, 10 + (i % 2) * 3),
-                                 position_randomness=(1, 0, 0.5)))
+            new_die = Die(self,
+                          position=((i // 2) * 4, -1, 10 + (i % 2) * 3),
+                          position_randomness=(1, 0, 0.5))
+            self.add_piece(new_die)
+            self.dice.append(new_die)
 
     def roll_dice(self):
         if not self.turn_stage == self.STAGE_ROLLING:
