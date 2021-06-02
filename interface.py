@@ -198,6 +198,7 @@ class UrGameWindow(QDialog):
         :type player: int
         """
         button_reply = QMessageBox.question(self, "Player {} wins!".format(player + 1), "Start a new game?",
-                                            buttons=[QMessageBox.Close, QMessageBox.Ok], defaultButton=QMessageBox.Ok)
+                                            buttons=QMessageBox.Close | QMessageBox.Ok,
+                                            defaultButton=QMessageBox.Ok)
         if button_reply == QMessageBox.Ok:
             self._start_new_game()
