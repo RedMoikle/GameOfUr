@@ -17,6 +17,7 @@ class UrGameWindow(QtWidgets.QDialog):
     dlg_instance = None
     def __init__(self, parent=maya_main_window()):
         super(UrGameWindow, self).__init__(parent)
+
         self.setObjectName(DIALOG_NAME)
         self.setWindowTitle("Royal Game of Ur, by Michael Stickler")
         self.setMinimumSize(300, 80)
@@ -60,6 +61,7 @@ class UrGameWindow(QtWidgets.QDialog):
         main_layout.addLayout(score_layout)
         main_layout.addLayout(info_layout)
         main_layout.addWidget(self.end_turn_button)
+
     def create_connections(self):
         pass
 

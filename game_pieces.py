@@ -217,6 +217,7 @@ class Token(Interactable):
         pm.sets(sg, forceElement=self.transform)
 
     def action(self):
+        # ignore moves if not your turn to move a piece
         if not self.manager.player_turn == self.player:
             return
         if not self.manager.turn_stage == self.manager.STAGE_MOVING:

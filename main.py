@@ -41,7 +41,7 @@ class GameManager(object):
         self.paths = [[9, 6, 3, 0, 1, 4, 7, 10, 13, 16, 19, 22, 21, 18, 15],
                       [11, 8, 5, 2, 1, 4, 7, 10, 13, 16, 19, 22, 23, 20, 17]]
 
-        self.player_scores = [0]*self.players
+        self.player_scores = [0] * self.players
         self.target_score = 7
         self.token_count = 7
         self.running = True
@@ -58,7 +58,6 @@ class GameManager(object):
         self.player_turn = 0
 
         self.rolled_value = None
-        self.start_turn()
 
     def __del__(self):
         self.delete_all()
@@ -94,15 +93,14 @@ class GameManager(object):
     def _selection_made(self, *args):
         if not self.running:
             return
-        print(args)
         sel = pm.selected()
         if not sel:
             return
         if sel[0] not in self.pieces:
             return
-        gameobject = self.pieces[sel[0]]
-        if isinstance(gameobject, Interactable):
-            gameobject.trigger_action()
+        game_object = self.pieces[sel[0]]
+        if isinstance(game_object, Interactable):
+            game_object.trigger_action()
             pm.select(clear=True)
 
     def create_pieces(self):
@@ -145,10 +143,12 @@ class GameManager(object):
             if token.tile_location == tile_position:
                 return token
         return None
+
     def score_point(self, player):
         self.player_scores[player] += 1
         if self.player_scores[player] >= self.target_score:
             self.win_game(player)
+
     def win_game(self, player):
         print("player {} wins".format(player+1))
         self.running = False
