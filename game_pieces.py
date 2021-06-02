@@ -224,7 +224,11 @@ class Token(Interactable):
             return
         rolled_value = self.manager.rolled_value
         target_position = self.path_position + rolled_value
-        if target_position < len(self.path):
+        if rolled_value == 0:
+            target_tile = None
+            move_check = [Messages.MOVE_BLOCKED, Messages.INVALID_MOVE]
+            collision = None
+        elif target_position < len(self.path):
             target_tile = self.path[target_position]
             move_check, collision = self.check_move(target_tile)
 
