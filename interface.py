@@ -140,9 +140,9 @@ class UrGameWindow(QDialog):
         self.p2_score.setFont(self.med_font)
         self.p2_score.setMinimumSize(32, 32)
 
-        self.roll_num = QLabel()
-        self.roll_num.setFont(self.big_font)
-        self.roll_num.setMinimumSize(64, 64)
+        self.roll_num_btn = QPushButton()
+        self.roll_num_btn.setFont(self.big_font)
+        self.roll_num_btn.setMinimumSize(64, 64)
         self.info_text = QTextEdit()
         self.info_text.setMinimumSize(100, 64)
         self.info_text.setFixedHeight(64)
@@ -156,7 +156,7 @@ class UrGameWindow(QDialog):
         score_layout.addWidget(self.p2_score)
 
         info_layout = QHBoxLayout()
-        info_layout.addWidget(self.roll_num)
+        info_layout.addWidget(self.roll_num_btn)
         info_layout.addWidget(self.info_text)
 
         main_layout = QVBoxLayout(self)

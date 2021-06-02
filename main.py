@@ -47,7 +47,7 @@ def run():
         # delete selection event/scriptjob if there is an error in setup
         if manager is not None:
             manager.delete_event()
-        raise e
+        print(e)
 
 
 class GameManager(object):
