@@ -221,7 +221,6 @@ class Die(Interactable):
         if new:
             material.setColor((0.1, 0.1, 0.1))
             texture_file = pm.shadingNode("file", asTexture=True)
-            print (texture_file)
             texture_file.fileTextureName.set(os.path.join(TEXTURES_DIR, "die.jpg"))
             pm.connectAttr(texture_file.outColor, material.color)
         pm.sets(sg, forceElement=self.transform)
@@ -240,7 +239,6 @@ class Die(Interactable):
         rolled_value = random.choice([0, 1])
         self.model_position = (ax + random.random() * ax_rand for ax, ax_rand in
                                zip(self.origin_position, self.position_randomness))
-        print(self.model_position)
         self.update_model_transform()
         self.transform.rotate.set((0, random.random() * 360, 109.47 * rolled_value))
         return rolled_value
@@ -312,7 +310,6 @@ class Token(Interactable):
     def update_model_transform(self):
         tile = self.tile_location()
         if tile is not None:
-            print(self.path_position)
             self.model_position = (tile % 3 + 0.5, 0, tile // 3 + 0.5)
         else:
             xpos = (self.token_id % 4 + 2.5) * (2 * self.player - 1) + 1.5
