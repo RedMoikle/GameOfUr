@@ -85,7 +85,7 @@ class GameManager(object):
         self.player_scores = [0] * self.players
         self.target_score = 7
         self.token_count = 7
-        self.running = True
+        self.running = False
         self.pieces = {}
         self.tokens = []
         self.dice = []
@@ -168,7 +168,9 @@ class GameManager(object):
                                   path=self.paths[player_i])
                 self.tokens.append(new_token)
         for i in range(4):
-            self.dice.append(Die(self, position=((i // 2) * 3, 0, 10 + (i % 2) * 3)))
+            self.dice.append(Die(self,
+                                 position=((i // 2) * 4, -1, 10 + (i % 2) * 3),
+                                 position_randomness=(1, 0, 0.5)))
 
     def roll_dice(self):
         if not self.turn_stage == self.STAGE_ROLLING:
