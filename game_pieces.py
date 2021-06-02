@@ -3,32 +3,9 @@ import random
 
 import pymel.core as pm
 
-TEXTURES_DIR = os.path.join(__file__, "textures")
+from utils import Messages, Signal
 
-
-class Messages(object):
-    INVALID_MOVE = "invalid-move"
-    FREE_TURN = "free-turn"
-    MOVE_BLOCKED = "move-blocked"
-    FRIENDLY_TOKEN = "friendly-token"
-    OPPONENT_TOKEN = "opponent-token"
-    PROTECTED_OPPONENT = "protected-opponent"
-    DISPLACED_OPPONENT = "displaced-opponent"
-    TOO_FAR = "too-far"
-    PATH_COMPLETE = "path-complete"
-    MOVE_SUCCESSFULL = "move-successful"
-
-
-class Signal(object):
-    def __init__(self):
-        self.connections = []
-
-    def connect(self, func):
-        self.connections.append(func)
-
-    def emit(self, *args, **kwargs):
-        for func in self.connections:
-            func(*args, **kwargs)
+TEXTURES_DIR = os.path.join(__file__.rsplit("\\", 1)[0], "textures")
 
 
 class GameObject(object):
