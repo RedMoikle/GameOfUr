@@ -17,6 +17,7 @@ class GameObject(object):
         self.manager = manager
 
         self.model_position = position
+        self.origin_position = position
         self.game_scale = game_scale
 
         self.transform = None
@@ -24,6 +25,10 @@ class GameObject(object):
         self.create_model()
         self.update_model_transform()
         self.manager.add_piece(self)
+
+    def reset(self):
+        self.model_position = self.origin_position
+        self.update_model_transform()
 
     def __del__(self):
         self.delete_model()
@@ -124,6 +129,11 @@ class Interactable(GameObject):
 class Die(Interactable):
     die_tex = pm.shadingNode("blinn", name="Ur_die", asShader=True)
 
+    def __init__(self, *args, **kwargs):
+        super(Die, self).__init__(*args, **kwargs)
+        self.position_randomness = kwargs.pop("position_randomness", (1, 0, 0.5))
+        self.roll()
+
     def create_model(self):
         self.transform, self.shape = pm.polyCone(subdivisionsAxis=3, radius=0.5, height=0.707)
         pm.move(self.transform.vtx[:], (0.25, 0.3535, 0), relative=True)
@@ -145,6 +155,10 @@ class Die(Interactable):
 
     def roll(self):
         rolled_value = random.choice([0, 1])
+        self.model_position = (ax + random.random() * ax_rand for ax, ax_rand in
+                               zip(self.origin_position, self.position_randomness))
+        print(self.model_position)
+        self.update_model_transform()
         self.transform.rotate.set((0, random.random() * 360, 109.47 * rolled_value))
         return rolled_value
 
@@ -160,6 +174,12 @@ class Token(Interactable):
         self.finished = kwargs.pop("finished", False)
 
         super(Token, self).__init__(*args, **kwargs)
+
+    def reset(self):
+        self.path_position = -1
+        self.on_path = False
+        self.finished = False
+        super(Token, self).reset()
 
     @property
     def tile_location(self):
