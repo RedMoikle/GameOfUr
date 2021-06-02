@@ -66,7 +66,7 @@ class UrGameWindow(QDialog):
 
     def set_roll(self, values):
         print(values)
-        self.roll_num.setText(str(sum(values)))
+        self.roll_num_btn.setText(str(sum(values)))
 
     def set_message(self, messages):
         print(messages)
@@ -145,11 +145,11 @@ class UrGameWindow(QDialog):
         self.set_message(["Select one of the dice to roll them and begin!"])
 
     def reset_roll(self, player):
-        self.roll_num.setText("Roll!")
+        self.roll_num_btn.setText("Roll!")
         if player == 0:
-            self.roll_num.setStyleSheet(p1_colour)
+            self.roll_num_btn.setStyleSheet(p1_colour)
         elif player == 1:
-            self.roll_num.setStyleSheet(p2_colour)
+            self.roll_num_btn.setStyleSheet(p2_colour)
 
     def _start_new_game(self):
         self.new_game.emit()
