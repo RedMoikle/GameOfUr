@@ -1,7 +1,6 @@
 import sys
-
-import pymel.core as pm
-from PySide2 import QtWidgets, QtCore
+from PySide2 import QtCore, QtGui
+from PySide2.QtWidgets import *
 from shiboken2 import wrapInstance
 import maya.OpenMayaUI as omui
 
@@ -16,10 +15,11 @@ p2_colour = "QWidget {background-color:#191919; color:#FFFFFF}"
 def maya_main_window():
     main_window = omui.MQtUtil.mainWindow()
     if py_version >= 3:
-        return wrapInstance(int(main_window), QtWidgets.QWidget)
-    return wrapInstance(long(main_window), QtWidgets.QWidget)
+        return wrapInstance(int(main_window), QWidget)
+    return wrapInstance(long(main_window), QWidget)
 
-class UrGameWindow(QtWidgets.QDialog):
+
+class UrGameWindow(QDialog):
     dlg_instance = None
     new_game = QtCore.Signal()
 
@@ -79,15 +79,15 @@ class UrGameWindow(QtWidgets.QDialog):
         self.end_turn_button.setEnabled(True)
 
     def create_actions(self):
-        self.new_game_action = QtWidgets.QAction("New game", self)
-        self.delete_all_action = QtWidgets.QAction("Delete all", self)
-        self.delete_event_action = QtWidgets.QAction("Delete event", self)
-        self.active_action = QtWidgets.QAction("Event active", self)
+        self.new_game_action = QAction("New game", self)
+        self.delete_all_action = QAction("Delete all", self)
+        self.delete_event_action = QAction("Delete event", self)
+        self.active_action = QAction("Event active", self)
         self.active_action.setCheckable(True)
         self.active_action.setChecked(True)
 
     def create_widgets(self):
-        self.menu = QtWidgets.QMenuBar()
+        self.menu = QMenuBar()
         game_menu = self.menu.addMenu("Game")
         game_menu.addAction(self.new_game_action)
 
@@ -96,38 +96,38 @@ class UrGameWindow(QtWidgets.QDialog):
         debug_menu.addAction(self.delete_event_action)
         debug_menu.addAction(self.active_action)
 
-        self.score_label = QtWidgets.QLabel("<b>Score:</b>")
-        self.p1_score = QtWidgets.QLabel()
+        self.score_label = QLabel("<b>Score:</b>")
+        self.p1_score = QLabel()
         self.p1_score.setAlignment(QtCore.Qt.AlignCenter)
         self.p1_score.setStyleSheet(p1_colour)
         self.p1_score.setFont(self.med_font)
         self.p1_score.setMinimumSize(32, 32)
-        self.p2_score = QtWidgets.QLabel()
+        self.p2_score = QLabel()
         self.p2_score.setAlignment(QtCore.Qt.AlignCenter)
         self.p2_score.setStyleSheet(p2_colour)
         self.p2_score.setFont(self.med_font)
         self.p2_score.setMinimumSize(32, 32)
 
-        self.roll_num = QtWidgets.QLabel("Roll!")
+        self.roll_num = QLabel()
         self.roll_num.setFont(self.big_font)
         self.roll_num.setMinimumSize(64, 64)
-        self.info_text = QtWidgets.QTextEdit()
+        self.info_text = QTextEdit()
         self.info_text.setMinimumSize(100, 64)
         self.info_text.setFixedHeight(64)
         self.info_text.setReadOnly(True)
-        self.end_turn_button = QtWidgets.QPushButton("End turn (no move possible)", enabled=False)
+        self.end_turn_button = QPushButton("End turn (no move possible)", enabled=False)
         self.reset_ui()
 
     def create_layouts(self):
-        score_layout = QtWidgets.QHBoxLayout()
+        score_layout = QHBoxLayout()
         score_layout.addWidget(self.p1_score)
         score_layout.addWidget(self.p2_score)
 
-        info_layout = QtWidgets.QHBoxLayout()
+        info_layout = QHBoxLayout()
         info_layout.addWidget(self.roll_num)
         info_layout.addWidget(self.info_text)
 
-        main_layout = QtWidgets.QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)
         main_layout.setMenuBar(self.menu)
         main_layout.addWidget(self.score_label)
         main_layout.addLayout(score_layout)
@@ -155,7 +155,7 @@ class UrGameWindow(QtWidgets.QDialog):
         self.new_game.emit()
 
     def win_message(self, player):
-        button_reply = QtWidgets.QMessageBox.question(self, "Player {} wins!".format(player + 1), "Start a new game?",
-                                           buttons=[QtWidgets.QMessageBox.Close, QtWidgets.QMessageBox.Ok], defaultButton=QtWidgets.QMessageBox.Ok)
-        if button_reply == QtWidgets.QMessageBox.Ok:
+        button_reply = QMessageBox.question(self, "Player {} wins!".format(player + 1), "Start a new game?",
+                                           buttons=[QMessageBox.Close, QMessageBox.Ok], defaultButton=QMessageBox.Ok)
+        if button_reply == QMessageBox.Ok:
             self._start_new_game()
