@@ -1,4 +1,5 @@
 import sys
+
 from PySide2 import QtCore, QtGui
 from PySide2.QtWidgets import *
 from shiboken2 import wrapInstance
@@ -7,9 +8,14 @@ import maya.OpenMayaUI as omui
 py_version = sys.version_info.major
 DIALOG_NAME = 'MGS_UR_dialog'
 
-# TODO: replace colours with palettes
-p1_colour = "QWidget {background-color:#E6E6E6; color:#000000}"
-p2_colour = "QWidget {background-color:#191919; color:#FFFFFF}"
+player_styles = ["QWidget {background-color:#E6E6E6; color:#000000}",
+                 "QWidget {background-color:#191919; color:#FFFFFF}"]
+
+
+def set_player_style(widget, player):
+    if not player < len(player_styles):
+        return
+    widget.setStyleSheet(player_styles[player])
 
 
 def maya_main_window():
@@ -27,13 +33,15 @@ class UrGameWindow(QDialog):
 
     :param parent: The parent widget for this interface (Default is Maya's main window)
     :type parent: QWidget
+    :param player_count: The number of players
+    :type player_count: int
     """
     dlg_instance = None
     new_game = QtCore.Signal()
 
-    def __init__(self, parent=maya_main_window()):
+    def __init__(self, parent=maya_main_window(), player_count=2):
         super(UrGameWindow, self).__init__(parent)
-
+        self.player_count = player_count
         self.setObjectName(DIALOG_NAME)
         self.setWindowTitle("Royal Game of Ur, by Michael Stickler")
         self.setMinimumSize(300, 80)
@@ -57,7 +65,7 @@ class UrGameWindow(QDialog):
     @classmethod
     def show_dialog(cls):
         """
-        Classmethod to show the UI (and create it if it doesn't exist already)
+        Class method to show the UI (and create it if it doesn't exist already)
         :return: The dialog window for this widget
         :rtype: UrGameWindow
 
@@ -82,11 +90,7 @@ class UrGameWindow(QDialog):
         :param score: Score value to set
         :type score: int
         """
-        # TODO: replace p1 and p2 scores with list
-        if player == 0:
-            self.p1_score.setText(str(score))
-        elif player == 1:
-            self.p2_score.setText(str(score))
+        self.player_score_displays[player].setText(str(score))
 
     def set_roll(self, values):
         """
@@ -129,16 +133,14 @@ class UrGameWindow(QDialog):
         debug_menu.addAction(self.active_action)
 
         self.score_label = QLabel("<b>Score:</b>")
-        self.p1_score = QLabel()
-        self.p1_score.setAlignment(QtCore.Qt.AlignCenter)
-        self.p1_score.setStyleSheet(p1_colour)
-        self.p1_score.setFont(self.med_font)
-        self.p1_score.setMinimumSize(32, 32)
-        self.p2_score = QLabel()
-        self.p2_score.setAlignment(QtCore.Qt.AlignCenter)
-        self.p2_score.setStyleSheet(p2_colour)
-        self.p2_score.setFont(self.med_font)
-        self.p2_score.setMinimumSize(32, 32)
+        self.player_score_displays = []
+        for i in range(self.player_count):
+            new_score_display = QLabel()
+            set_player_style(new_score_display, i)
+            self.player_score_displays.append(new_score_display)
+            new_score_display.setAlignment(QtCore.Qt.AlignCenter)
+            new_score_display.setFont(self.med_font)
+            new_score_display.setMinimumSize(32, 32)
 
         self.roll_num_btn = QPushButton()
         self.roll_num_btn.setFont(self.big_font)
@@ -152,8 +154,8 @@ class UrGameWindow(QDialog):
 
     def create_layouts(self):
         score_layout = QHBoxLayout()
-        score_layout.addWidget(self.p1_score)
-        score_layout.addWidget(self.p2_score)
+        for display in self.player_score_displays:
+            score_layout.addWidget(display)
 
         info_layout = QHBoxLayout()
         info_layout.addWidget(self.roll_num_btn)
@@ -184,10 +186,7 @@ class UrGameWindow(QDialog):
         :type player: int
         """
         self.roll_num_btn.setText("Roll!")
-        if player == 0:
-            self.roll_num_btn.setStyleSheet(p1_colour)
-        elif player == 1:
-            self.roll_num_btn.setStyleSheet(p2_colour)
+        set_player_style(self.roll_num_btn, player)
 
     def _start_new_game(self):
         self.new_game.emit()
@@ -199,6 +198,6 @@ class UrGameWindow(QDialog):
         :type player: int
         """
         button_reply = QMessageBox.question(self, "Player {} wins!".format(player + 1), "Start a new game?",
-                                           buttons=[QMessageBox.Close, QMessageBox.Ok], defaultButton=QMessageBox.Ok)
+                                            buttons=[QMessageBox.Close, QMessageBox.Ok], defaultButton=QMessageBox.Ok)
         if button_reply == QMessageBox.Ok:
             self._start_new_game()
