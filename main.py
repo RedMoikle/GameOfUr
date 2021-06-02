@@ -139,7 +139,7 @@ class GameManager(object):
         self.delete_event()
         for piece in self.pieces.values():
             piece.delete_model()
-            piece.delete_textures()
+            piece.delete_materials()
         self.pieces = {}
 
     def _selection_made(self, *args):

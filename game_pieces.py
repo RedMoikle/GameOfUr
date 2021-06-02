@@ -37,7 +37,7 @@ class GameObject(object):
         pass
 
     @classmethod
-    def create_shader(cls, name, shader_type="blinn"):
+    def create_material(cls, name, shader_type="blinn"):
         """Create and return a shader setup with the specified name. If one already exists, return that instead.
 
         Use this to avoid creating duplicate materials
@@ -54,6 +54,17 @@ class GameObject(object):
 
         return (new, cls.textures[name][0], cls.textures[name][1])
 
+    @classmethod
+    def delete_materials(cls):
+        if not cls.textures:
+            return
+        for name, tex in cls.textures.items():
+            try:
+                pm.delete(tex)
+            except pm.MayaNodeError as e:
+                print("{} already deleted".format(name))
+        cls.textures = {}
+
     def update_model_transform(self):
         xpos, ypos, zpos = (float(ax) * self.game_scale for ax in self.model_position)
         pm.move(xpos, ypos, zpos, self.transform)
@@ -63,13 +74,7 @@ class GameObject(object):
         self.transform = None
         self.shape = None
 
-    def delete_textures(self):
-        for name, tex in self.textures.items():
-            try:
-                pm.delete(tex)
-            except pm.MayaNodeError as e:
-                print("{} already deleted".format(name))
-        self.textures = {}
+
 
 
 class Floor(GameObject):
@@ -95,12 +100,12 @@ class BoardTile(GameObject):
 
     def create_textures(self):
         if self.rosetta:
-            new, material, sg = self.create_shader("tile_rosetta")
+            new, material, sg = self.create_material("tile_rosetta")
             if new:
                 material.setColor((0.75, 0.1, 0.05))
             pm.sets(sg, forceElement=self.transform)
             return
-        new, material, sg = self.create_shader("tile_normal")
+        new, material, sg = self.create_material("tile_normal")
         if new:
             material.setColor((0.5, 0.25, 0.05))
         pm.sets(sg, forceElement=self.transform)
@@ -141,7 +146,7 @@ class Die(Interactable):
         self.create_textures()
 
     def create_textures(self):
-        new, material, sg = self.create_shader("die")
+        new, material, sg = self.create_material("die")
         if new:
             material.setColor((0.1, 0.1, 0.1))
             texture_file = pm.shadingNode("file", asTexture=True)
@@ -214,7 +219,7 @@ class Token(Interactable):
         self.create_textures()
 
     def create_textures(self):
-        new, material, sg = self.create_shader("player_{}".format(self.player + 1))
+        new, material, sg = self.create_material("player_{}".format(self.player + 1))
         if new:
             material.setColor((0.9 - self.player * 0.8, 0.9 - self.player * 0.8, 0.9 - self.player * 0.8))
         pm.sets(sg, forceElement=self.transform)
