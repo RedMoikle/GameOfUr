@@ -47,9 +47,7 @@ class GameObject(object):
             sg = pm.sets(name="Ur_{}_SG".format(name), empty=True, renderable=True, noSurfaceShader=True)
             material.outColor.connect(sg.surfaceShader)
             cls.textures[name] = (material, sg)
-        else:
-            pass
-            #print("shader {} already exists".format(name))
+
         return (new, cls.textures[name][0], cls.textures[name][1])
 
     def update_model_transform(self):
@@ -88,14 +86,7 @@ class BoardTile(GameObject):
         self.transform, self.shape = pm.polyCube(name="Ur_Tile")
 
         # move shape but keep transform at 0,0,0
-        # TODO: find a more elegant way of moving shape. Maybe movePolyVertex?
-        # TODO: rosetta tiles
-        rotate_pivot = self.transform.rotatePivot
-        scale_pivot = self.transform.scalePivot
-        pm.move(-0.5, 0.5, -0.5, rotate_pivot, scale_pivot, rotatePivotRelative=True)
-        pm.move(0.5, -0.5, 0.5, self.transform)
-        pm.makeIdentity(self.transform, apply=True, translate=True)
-        print(self.transform)
+        pm.move(self.transform.vtx[:], (0.5, -0.5, 0.5), relative=True)
         self.create_textures()
 
     def create_textures(self):
@@ -134,14 +125,9 @@ class Die(Interactable):
     die_tex = pm.shadingNode("blinn", name="Ur_die", asShader=True)
 
     def create_model(self):
-        self.transform, self.shape = pm.polyCone(subdivisionsAxis=3, height=1.44)
-        rotate_pivot = self.transform.rotatePivot
-        scale_pivot = self.transform.scalePivot
-        pm.move(-0.5, -0.72, 0.0, rotate_pivot, scale_pivot, rotatePivotRelative=True)
-        pm.move(0.5, -0.27, 0.0, self.transform)
-        pm.makeIdentity(self.transform, apply=True, translate=True)
+        self.transform, self.shape = pm.polyCone(subdivisionsAxis=3, radius=0.5, height=0.707)
+        pm.move(self.transform.vtx[:], (0.25, 0.3535, 0), relative=True)
         self.transform.setRotationOrder(6, True)
-        self.transform.rotate.set((0, random.random() * 360, 109.47 * random.choice([0, 1])))
         self.create_textures()
 
     def create_textures(self):
@@ -213,7 +199,6 @@ class Token(Interactable):
             return
         if not self.manager.turn_stage == self.manager.STAGE_MOVING:
             return
-
         rolled_value = self.manager.rolled_value
         target_position = self.path_position + rolled_value
         if target_position < len(self.path):
@@ -224,6 +209,7 @@ class Token(Interactable):
             target_tile = None
             move_check = [Messages.MOVE_BLOCKED, Messages.TOO_FAR]
             collision = None
+
         if target_tile is not None:
             print(
                 "trying to move to {} - {} ({})".format(target_position, target_tile, self.manager.board[target_tile]))
