@@ -127,6 +127,7 @@ class Interactable(GameObject):
 
 
 class Die(Interactable):
+    die_clicked = Signal()
     die_tex = pm.shadingNode("blinn", name="Ur_die", asShader=True)
 
     def __init__(self, *args, **kwargs):
@@ -151,7 +152,7 @@ class Die(Interactable):
         pm.sets(sg, forceElement=self.transform)
 
     def action(self):
-        self.manager.roll_dice()
+        self.die_clicked.emit()
 
     def roll(self):
         rolled_value = random.choice([0, 1])
@@ -164,6 +165,9 @@ class Die(Interactable):
 
 
 class Token(Interactable):
+    point_scored = Signal()
+    move_successful = Signal()
+    move_unsuccessful = Signal()
 
     def __init__(self, *args, **kwargs):
         self.player = kwargs.pop("player", None)
@@ -243,7 +247,7 @@ class Token(Interactable):
         print(move_check)
 
         if Messages.MOVE_BLOCKED in move_check:
-            # TODO: feedback to show why a move is invalid
+            self.move_unsuccessful.emit(move_check)
             return
 
         if Messages.DISPLACED_OPPONENT in move_check:
@@ -255,9 +259,11 @@ class Token(Interactable):
         if Messages.PATH_COMPLETE in move_check:
             self.end_path()
         if Messages.FREE_TURN not in move_check:
-            self.manager.end_turn()
+            pass
+            # self.manager.end_turn()
         else:
             self.manager.free_turn()
+        self.move_successful.emit(move_check)
 
     def move(self, path_position):
         self.path_position = path_position
@@ -272,7 +278,7 @@ class Token(Interactable):
         self.finished = True
         self.on_path = False
         self.update_model_transform()
-        self.manager.score_point(self.player)
+        self.point_scored.emit(self.player)
 
     def check_move(self, target_tile):
         messages = []
@@ -302,3 +308,13 @@ class Token(Interactable):
                 messages.append(Messages.MOVE_SUCCESSFULL)
 
         return messages, collision
+
+    def can_move(self, distance):
+        if not distance:
+            return False
+        target_position = self.path_position + distance
+        if target_position < len(self.path):
+            target_tile = self.path[target_position]
+            move_check, collision = self.check_move(target_tile)
+            return Messages.MOVE_SUCCESSFULL in move_check
+        return False

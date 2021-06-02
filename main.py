@@ -10,11 +10,34 @@ import maya.OpenMaya as om
 
 from game_pieces import *
 import interface
+from utils import Messages, Signal
+
 
 def run():
-    manager = GameManager()
-    ui = interface.UrGameWindow.show_dialog()
-    return manager, ui
+    try:
+        manager = GameManager()
+        ui = interface.UrGameWindow.show_dialog()
+
+        ui.end_turn_button.clicked.connect(manager.end_turn)
+        ui.delete_event_action.triggered.connect(manager.delete_event)
+        ui.delete_all_action.triggered.connect(manager.delete_all)
+        ui.active_action.toggled.connect(manager.set_event_active)
+        ui.new_game.connect(manager.start_game)
+        ui.roll_num_btn.clicked.connect(manager.roll_dice)
+        manager.dice_rolled.connect(ui.set_roll)
+        manager.point_scored.connect(ui.set_score)
+        manager.message_updated.connect(ui.set_message)
+        manager.cant_move.connect(ui.enable_end_btn)
+        manager.roll_requested.connect(ui.reset_roll)
+        manager.new_game_started.connect(ui.reset_ui)
+        manager.game_won.connect(ui.win_message)
+
+        manager.start_game()
+        return manager, ui
+    except Exception as e:
+        manager.delete_event()
+        raise e
+
 
 
 class GameManager(object):
@@ -23,8 +46,26 @@ class GameManager(object):
     TILE_ROSETTA = 2
     TILE_GOAL = 3
 
+    message_text = {Messages.INVALID_MOVE: "Invalid move.",
+                    Messages.FREE_TURN: "Landed on a rosetta: Free turn.",
+                    Messages.MOVE_BLOCKED: "Move blocked.",
+                    Messages.FRIENDLY_TOKEN: "A friendly token is in the way",
+                    Messages.OPPONENT_TOKEN: "An opponent's token is in the way",
+                    Messages.PROTECTED_OPPONENT: "The opponent's token is protected by the rosetta tile.",
+                    Messages.DISPLACED_OPPONENT: "You sent the opponent's token back home.",
+                    Messages.TOO_FAR: "Too far! This would overshoot the goal.",
+                    Messages.PATH_COMPLETE: "One token reached the goal, you get 1 point!",
+                    Messages.MOVE_SUCCESSFULL: "Moved token"}
     STAGE_ROLLING = "rolling"
     STAGE_MOVING = "moving"
+
+    dice_rolled = Signal()
+    point_scored = Signal()
+    message_updated = Signal()
+    cant_move = Signal()
+    roll_requested = Signal()
+    new_game_started = Signal()
+    game_won = Signal()
 
     def __init__(self):
         self.board_scale = 1.0
@@ -62,8 +103,19 @@ class GameManager(object):
     def __del__(self):
         self.delete_all()
 
-    def start_turn(self):
-        self.turn_stage = self.STAGE_ROLLING
+    def start_game(self):
+        self.set_event_active(True)
+        self.player_scores = [0] * self.players
+        self.rolled_value = None
+
+        for piece in self.pieces.values():
+            piece.reset()
+
+        self.new_game_started.emit()
+        self.start_turn(0)
+
+    def set_event_active(self, active):
+        self.running = active
 
     def add_piece(self, piece):
         self.pieces[piece.transform] = piece
@@ -104,6 +156,10 @@ class GameManager(object):
             pm.select(clear=True)
 
     def create_pieces(self):
+        Token.point_scored.connect(self.score_point)
+        Token.move_successful.connect(self.piece_moved)
+        Token.move_unsuccessful.connect(self.piece_blocked)
+        Die.die_clicked.connect(self.roll_dice)
         for player_i in range(self.players):
             for i in range(self.token_count):
                 new_token = Token(self,
@@ -121,15 +177,29 @@ class GameManager(object):
         self.rolled_value = sum(rolled_values)
         print("Rolled: {} [{}]".format(self.rolled_value, "| ".join(map(str, rolled_values))))
         self.turn_stage = self.STAGE_MOVING
-        if self.rolled_value == 0:
-            self.end_turn()
+        self.dice_rolled.emit(rolled_values)
+        if not self.can_move(self.rolled_value, self.player_turn):
+            self.cant_move.emit()
+
+    def can_move(self, distance, player):
+        for token in self.tokens:
+            if not token.player == player:
+                continue
+            if token.can_move(distance):
+                return True
+        return False
+
+    def start_turn(self, player):
+        self.turn_stage = self.STAGE_ROLLING
+        self.player_turn = player
+        self.roll_requested.emit(player)
 
     def end_turn(self):
-        self.turn_stage = self.STAGE_ROLLING
-        self.player_turn = (self.player_turn + 1) % self.players
+        self.start_turn((self.player_turn + 1) % self.players)
 
     def free_turn(self):
         self.turn_stage = self.STAGE_ROLLING
+        self.roll_requested.emit(self.player_turn)
 
     def get_position_collision(self, tile_position):
         """Check if a token already exists on the specified tile.
@@ -146,11 +216,26 @@ class GameManager(object):
 
     def score_point(self, player):
         self.player_scores[player] += 1
+        self.point_scored.emit(player, self.player_scores[player])
         if self.player_scores[player] >= self.target_score:
             self.win_game(player)
 
     def win_game(self, player):
-        print("player {} wins".format(player+1))
+        print("player {} wins".format(player + 1))
+        self.message_updated.emit("Player {} wins!".format(player + 1))
+        self.game_won.emit(player)
         self.running = False
+
+    def piece_moved(self, messages):
+        print(messages)
+        self.message_updated.emit([self.message_text[m] for m in messages])
+        if Messages.FREE_TURN not in messages:
+            self.end_turn()
+
+    def piece_blocked(self, messages):
+        print(messages)
+        self.message_updated.emit([self.message_text[m] for m in messages])
+
+
 if __name__ == '__main__':
     ur_manager, ur_ui = run()
