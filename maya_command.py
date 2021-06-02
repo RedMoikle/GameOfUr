@@ -5,19 +5,18 @@ As such it will likely show errors in the IDE which should be ignored.
 Note: could also build this into the __init__ module of the package, so the game would start upon importing it.
 """
 
-
 try:
     # This should not be included in a production environment just for quick testing of changes without restarting Maya
     reload(GameOfUr.game_pieces)
     reload(GameOfUr.interface)
-    reload(ur)
+    reload(MGS_ur)
 
 
 except NameError as e:
     print("first load")
     print(e)
+
 import GameOfUr
-import GameOfUr.main as ur
+import GameOfUr.main as MGS_ur
 
-ur_game, ur_ui = ur.run()
-
+MGS_ur_game, MGS_ur_ui = MGS_ur.run()
