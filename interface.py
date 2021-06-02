@@ -13,6 +13,7 @@ p2_colour = "QWidget {background-color:#191919; color:#FFFFFF}"
 
 
 def maya_main_window():
+    """Get a reference to Maya's main window"""
     main_window = omui.MQtUtil.mainWindow()
     if py_version >= 3:
         return wrapInstance(int(main_window), QWidget)
@@ -20,6 +21,13 @@ def maya_main_window():
 
 
 class UrGameWindow(QDialog):
+    """
+    Main ui window for the game. This contains useful information about the game for convenience such as scores,
+    rolled values and information about the last move
+
+    :param parent: The parent widget for this interface (Default is Maya's main window)
+    :type parent: QWidget
+    """
     dlg_instance = None
     new_game = QtCore.Signal()
 
@@ -42,11 +50,20 @@ class UrGameWindow(QDialog):
         self.create_connections()
 
     def closeEvent(self, event):
+        """Overridden from QDialog to clean up the game if the UI is closed."""
         self.delete_all_action.trigger()
         event.accept()
 
     @classmethod
     def show_dialog(cls):
+        """
+        Classmethod to show the UI (and create it if it doesn't exist already)
+        :return: The dialog window for this widget
+        :rtype: UrGameWindow
+
+        :Example:
+            ur_interface = UrGameWindow.show_dialog()
+        """
         if cls.dlg_instance is None:
             cls.dlg_instance = cls()
 
@@ -58,6 +75,13 @@ class UrGameWindow(QDialog):
         return cls.dlg_instance
 
     def set_score(self, player, score):
+        """
+        Set the score display for the specified player index
+        :param player: Index of the player (0 is player 1)
+        :type player: int
+        :param score: Score value to set
+        :type score: int
+        """
         # TODO: replace p1 and p2 scores with list
         if player == 0:
             self.p1_score.setText(str(score))
@@ -65,11 +89,19 @@ class UrGameWindow(QDialog):
             self.p2_score.setText(str(score))
 
     def set_roll(self, values):
-        print(values)
+        """
+        Set the display for the rolled value
+        :param values: List of all rolled dice values
+        :type values: List(int)
+        """
         self.roll_num_btn.setText(str(sum(values)))
 
     def set_message(self, messages):
-        print(messages)
+        """
+        Set a series of messages to be displayed in the info panel
+        :param messages: list of message strings
+        :type messages: List[str]
+        """
         self.info_text.setText("\n".join(map(str, messages)))
 
     def disable_end_btn(self):
@@ -139,12 +171,18 @@ class UrGameWindow(QDialog):
         self.new_game_action.triggered.connect(self._start_new_game)
 
     def reset_ui(self):
+        """Reset the ui for a new game"""
         self.reset_roll(0)
         self.set_score(0, 0)
         self.set_score(1, 0)
         self.set_message(["Select one of the dice to roll them and begin!"])
 
     def reset_roll(self, player):
+        """
+        Reset the die roll display to be ready for a new roll from the specified player.
+        :param player: player index (0 is player 1) to change colours to
+        :type player: int
+        """
         self.roll_num_btn.setText("Roll!")
         if player == 0:
             self.roll_num_btn.setStyleSheet(p1_colour)
@@ -155,6 +193,11 @@ class UrGameWindow(QDialog):
         self.new_game.emit()
 
     def win_message(self, player):
+        """
+        Display a win message dialog and ask if the player wants to start a new game
+        :param player: The index of the player who won the game (0 is player 1)
+        :type player: int
+        """
         button_reply = QMessageBox.question(self, "Player {} wins!".format(player + 1), "Start a new game?",
                                            buttons=[QMessageBox.Close, QMessageBox.Ok], defaultButton=QMessageBox.Ok)
         if button_reply == QMessageBox.Ok:

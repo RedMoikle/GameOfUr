@@ -1,4 +1,5 @@
-"""This module is not intended to be imported. It is instead supposed to be run with maya's __main__ interpreter.
+"""
+This module is not intended to be imported. It is instead supposed to be run with maya's __main__ interpreter.
 This file is merely for conveneience - to either copy to a shelf button, or to be run with PyCharm's MayaCharm plugin.
 As such it will likely show errors in the IDE which should be ignored.
 
