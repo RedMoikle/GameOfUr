@@ -86,6 +86,7 @@ Along the middle row, both players share the same path, and can come into confli
 
 The "Roll" button changes to show the value rolled on the dice. Select one of your pieces, and it will move that many
 places along its path. (If it is possible to do so)
+
 ![Move a piece](demo_images/demo_move.jpg)
 
 ---
@@ -144,12 +145,15 @@ the board and play again.
 Your turn will end automatically once you finish your move, however sometimes you will be unable to move.
 
 - Sometimes you will be unlucky and roll a zero.
+  
   ![End turn](demo_images/demo_end_turn.jpg)
 
 
 - Sometimes (usually near the end of the game) you will roll more than a zero, but all of your pieces are blocked for
   various reasons, meaning no move is possible
+  
   ![No tokens can move 4 spaces](demo_images/demo_cant_move.jpg)
+
 
 In either of these cases, there is nothing you can do, so the "End turn" button will be enabled. Click it to pass the
 dice to the other player.
