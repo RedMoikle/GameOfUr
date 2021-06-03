@@ -127,7 +127,7 @@ class BoardTile(GameObject):
 
     def create_model(self):
         self.transform, self.shape = pm.polyCube(name="Ur_Tile")
-
+        self.transform.rotate.set((0, 90 * random.randint(0, 4), 0))
         # move shape but keep transform at 0,0,0
         pm.move(self.transform.vtx[:], (0.5, -0.5, 0.5), relative=True)
         self.create_textures()
@@ -137,12 +137,26 @@ class BoardTile(GameObject):
         if self.rosetta:
             new, material, sg = self.create_material("tile_rosetta")
             if new:
-                material.setColor((0.75, 0.1, 0.05))
+                # material.setColor((0.75, 0.1, 0.05))
+                texture_file = pm.shadingNode("file", asTexture=True)
+                texture_file.fileTextureName.set(os.path.join(TEXTURES_DIR, "tile_rosetta_diff.jpg"))
+                pm.connectAttr(texture_file.outColor, material.color)
+
+                texture_file = pm.shadingNode("file", asTexture=True)
+                texture_file.fileTextureName.set(os.path.join(TEXTURES_DIR, "tile_rosetta_spec.jpg"))
+                pm.connectAttr(texture_file.outColor, material.specularColor)
             pm.sets(sg, forceElement=self.transform)
             return
         new, material, sg = self.create_material("tile_normal")
         if new:
-            material.setColor((0.5, 0.25, 0.05))
+            # material.setColor((0.5, 0.25, 0.05))
+            texture_file = pm.shadingNode("file", asTexture=True)
+            texture_file.fileTextureName.set(os.path.join(TEXTURES_DIR, "tile_normal_diff.jpg"))
+            pm.connectAttr(texture_file.outColor, material.color)
+
+            texture_file = pm.shadingNode("file", asTexture=True)
+            texture_file.fileTextureName.set(os.path.join(TEXTURES_DIR, "tile_normal_spec.jpg"))
+            pm.connectAttr(texture_file.outColor, material.specularColor)
         pm.sets(sg, forceElement=self.transform)
 
 
@@ -328,6 +342,19 @@ class Token(Interactable):
         new, material, sg = self.create_material("player_{}".format(self.player + 1))
         if new:
             material.setColor((0.9 - self.player * 0.8, 0.9 - self.player * 0.8, 0.9 - self.player * 0.8))
+            if self.player == 0:
+                texture_file = pm.shadingNode("file", asTexture=True)
+                texture_file.fileTextureName.set(os.path.join(TEXTURES_DIR, "token_light_diff.jpg"))
+                pm.connectAttr(texture_file.outColor, material.color)
+            else:
+                texture_file = pm.shadingNode("file", asTexture=True)
+                texture_file.fileTextureName.set(os.path.join(TEXTURES_DIR, "token_dark_diff.jpg"))
+                pm.connectAttr(texture_file.outColor, material.color)
+
+            texture_file = pm.shadingNode("file", asTexture=True)
+            texture_file.fileTextureName.set(os.path.join(TEXTURES_DIR, "token_spec.jpg"))
+            pm.connectAttr(texture_file.outColor, material.specularColor)
+
         pm.sets(sg, forceElement=self.transform)
 
     def action(self):

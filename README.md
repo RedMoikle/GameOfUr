@@ -2,6 +2,8 @@
 
 **by Michael Stickler**
 
+![Game shown with new textures](demo_images/new_textures.jpg)
+
 This is a recreation of my very first Python project. While learning the language, I created a playable board game
 inside of Maya, based on the ancient Mesopotamian "Royal Game of Ur".
 
