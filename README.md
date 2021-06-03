@@ -5,7 +5,7 @@
 ![Game shown with new textures](demo_images/new_textures.jpg)
 
 This is a recreation of my very first Python project. While learning the language, I created a playable board game
-inside of Maya, based on the ancient Mesopotamian "Royal Game of Ur".
+inside of Maya, based on the ancient Mesopotamian "Royal Game of Ur". I have revisited the idea and rebuilt it from scratch using some of the things I have learned in the past few years.
 
 You can see the game being played [here](https://www.youtube.com/watch?v=WZskjLq040I)
 
