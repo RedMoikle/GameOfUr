@@ -13,7 +13,7 @@ This game uses API callbacks placed on automatically generated Maya objects to i
 
 ## Installation
 
-1. Copy the whole GameOfUr folder (containing `"\_\_init__.py"` and other files)
+1. Copy the whole GameOfUr folder (containing `\_\_init__.py` and other files)
 
 
 2. Paste it in `\Documents\Maya\MAYA_VERSION\scripts`
