@@ -38,7 +38,7 @@ class UrGameWindow(QDialog):
     """
     dlg_instance = None
     new_game = QtCore.Signal()
-
+    close_event = QtCore.Signal(UrGameWindow)
     def __init__(self, parent=maya_main_window(), player_count=2):
         super(UrGameWindow, self).__init__(parent)
         self.player_count = player_count
@@ -60,6 +60,7 @@ class UrGameWindow(QDialog):
     def closeEvent(self, event):
         """Overridden from QDialog to clean up the game if the UI is closed."""
         self.delete_all_action.trigger()
+        self.close_event.emit(self)
         event.accept()
 
     @classmethod

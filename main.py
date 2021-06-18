@@ -32,6 +32,7 @@ def run():
         ui.active_action.toggled.connect(manager.set_event_active)
         ui.new_game.connect(manager.start_game)
         ui.roll_num_btn.clicked.connect(manager.roll_dice)
+        ui.close_event.connect(make_disconnect_func(manager))
         manager.dice_rolled.connect(ui.set_roll)
         manager.point_scored.connect(ui.set_score)
         manager.message_updated.connect(ui.set_message)
@@ -48,6 +49,18 @@ def run():
         if manager is not None:
             manager.delete_event()
         print(e)
+
+
+def make_disconnect_func(manager):
+    def disconnect(ui):
+        ui.end_turn_button.clicked.disconnect(manager.end_turn)
+        ui.delete_event_action.triggered.disconnect(manager.delete_event)
+        ui.delete_all_action.triggered.disconnect(manager.delete_all)
+        ui.active_action.toggled.disconnect(manager.set_event_active)
+        ui.new_game.disconnect(manager.start_game)
+        ui.roll_num_btn.clicked.disconnect(manager.roll_dice)
+
+    return disconnect
 
 
 class GameManager(object):
@@ -231,15 +244,15 @@ class GameManager(object):
             # ignore if a roll is not needed now
             return
 
-        #roll all dice and get a list and a sum of their values
+        # roll all dice and get a list and a sum of their values
         rolled_values = [die.roll() for die in self.dice]
         self.rolled_value = sum(rolled_values)
 
-        #switch to piece movement
+        # switch to piece movement
         self.turn_stage = self.STAGE_MOVING
         self.dice_rolled.emit(rolled_values)
 
-        #if none of the pieces can move, emit a signal
+        # if none of the pieces can move, emit a signal
         if not self.can_move(self.rolled_value, self.player_turn):
             self.cant_move.emit()
 
