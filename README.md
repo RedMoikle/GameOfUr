@@ -30,7 +30,7 @@ This game uses API callbacks placed on automatically generated Maya objects to i
 4. A window will pop up with a button to launch the game.
    > If no window appears, try entering the following instead:
    > ```python 
-   > mgs_ur_show_launcher()
+   > MGS_ur.run()
    > ```
 
 
